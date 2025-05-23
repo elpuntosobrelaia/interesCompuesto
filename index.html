@@ -62,16 +62,18 @@
 
       let capital = inicial;
       let datos = [];
+      let capitalAportado = [];
       let aportado = inicial;
       let años = [];
 
-      for (let i = 1; i <= anios * frecuencia; i++) {
-        capital = capital * (1 + interes / frecuencia) + aporte;
-        if (i % frecuencia === 0) {
-          datos.push(capital);
-          años.push(i / frecuencia);
+      for (let anio = 1; anio <= anios; anio++) {
+        for (let p = 0; p < frecuencia; p++) {
+          capital = capital * (1 + interes / frecuencia) + aporte;
+          aportado += aporte;
         }
-        aportado += aporte;
+        datos.push(capital);
+        capitalAportado.push(aportado);
+        años.push(anio);
       }
 
       const interesesGanados = capital - aportado;
@@ -98,7 +100,7 @@
             },
             {
               label: 'Capital aportado',
-              data: años.map(a => inicial + aporte * a * frecuencia / frecuencia),
+              data: capitalAportado,
               borderColor: 'green',
               borderDash: [5, 5],
               fill: false
