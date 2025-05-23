@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Interés Compuesto</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { margin-bottom: 20px; }
+    label { display: block; margin: 10px 0 5px; }
+    input, select { margin-bottom: 10px; }
+    #resultados { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Calculadora de Patrimonio Futuro con Interés Compuesto</h1>
+
+  <form id="formInteres">
+    <label>Inversión inicial: <input type="number" id="inicial" required></label>
+    <label>Aportación periódica: <input type="number" id="aportacion" required></label>
+    <label>Periodicidad:
+      <select id="periodicidad">
+        <option value="12">Mensual</option>
+        <option value="4">Trimestral</option>
+        <option value="1">Anual</option>
+      </select>
+    </label>
+    <label>Interés anual (%): <input type="number" id="interes" step="0.01" required></label>
+    <label>Años: <input type="number" id="anios" required></label>
+    <br>
+    <button type="button" onclick="calcularInteresCompuesto()">Calcular</button>
+  </form>
+
+  <div id="resultados"></div>
+  <canvas id="grafica" width="600" height="300"></canvas>
+
+  <script>
+    function calcularInteresCompuesto() {
+      const P = parseFloat(document.getElementById('inicial').value);
+      const A = parseFloat(document.getElementById('aportacion').value);
+      const n = parseInt(document.getElementById('periodicidad').value);
+      const r = parseFloat(document.getElementById('interes').value) / 100;
+      const t = parseInt(document.getElementById('anios').value);
+
+      let valores = [];
+      let labels = [];
+      let totalInvertido = P;
+      let monto = P;
+
+      for (let i = 1; i <= t * n; i++) {
+        monto *= (1 + r / n);
+        monto += A;
+        if (i % n === 0) {
+          valores.push(monto.toFixed(2));
+          labels.push(i / n + ' año' + (i / n > 1 ? 's' : ''));
+        }
+        totalInvertido += A;
+      }
+
+      const intereses = monto - totalInvertido;
+
+      document.getElementById('resultados').innerHTML = `
+        <h2>Resultados</h2>
+        <p>Total invertido: <strong>€${totalInvertido.toFixed(2)}</strong></p>
+        <p>Valor futuro: <strong>€${monto.toFixed(2)}</strong></p>
+        <p>Intereses generados: <strong>€${intereses.toFixed(2)}</strong></p>
+      `;
+
+      const ctx = document.getElementById('grafica').getContext('2d');
+      if (window.chart) window.chart.destroy();
+      window.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Valor acumulado (€)',
+            data: valores,
+            borderColor: 'green',
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' },
+            title: { display: true, text: 'Evolución del Patrimonio con Interés Compuesto' }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
